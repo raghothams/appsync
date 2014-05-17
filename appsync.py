@@ -24,8 +24,8 @@ def main():
 
   except Exception as e:
     print e
-    # exit with zero - indicating error
-    exit(0)
+    # exit with non zero - indicating error
+    exit(1)
 
   if output and not output[1]:
 
@@ -37,11 +37,15 @@ def main():
     apps = [app for app in apps if app]
 
     # filter only the application name from the path of application
-    app_names = [re.findall('.*\/(.*).app', app)[0] for app in apps]
+    app_names=[]
+    for app in apps:
+        app_path_parts = app.split("/")
+        app_names.append(app_path_parts[-1])
 
     # write app names to a file
     with open("apps.txt", "w") as wf:
-      [wf.write(app_name+"\n") for app_name in app_names]
+        for app_name in app_names:
+            wf.write(app_name + "\n")
 
 if __name__ == "__main__":
   main()
