@@ -56,4 +56,4 @@ docs/_build/
 *.swp
 
 #conf files
-*.conf.py
+*conf.py
