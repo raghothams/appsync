@@ -54,3 +54,6 @@ docs/_build/
 
 #vim
 *.swp
+
+#conf files
+*.conf.py
