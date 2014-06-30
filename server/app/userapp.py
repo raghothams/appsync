@@ -54,8 +54,8 @@ class UserApp:
 
             print apps
             print user_id
-            query = "UPDATE public.user_apps SET apps = %s WHERE user_id = %s"
-            cur.execute(query, (apps, user_id, ))
+            query = "UPDATE public.user_apps SET apps = %s, updated = %s WHERE user_id = %s"
+            cur.execute(query, (apps, datetime.datetime.now(), user_id, ))
 
             if cur.rowcount == 1: 
 
@@ -86,7 +86,7 @@ class UserApp:
             print row
 
             result = {}
-            result['last_updated'] = row[2]
+            result['last_updated'] = str(row[2])
             result['apps'] = row[1]
             result['user'] = row[0]
 
