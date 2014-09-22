@@ -58,6 +58,8 @@ class UserDAO:
                 row = cur.fetchone()
                 self.db.commit()
                 result = row[0]
+                app_mapper = UserApp()
+                app_mapper.init(result)
 
         except Exception as e:
 
@@ -71,6 +73,7 @@ class UserDAO:
             cur.close()
             return result
    
+
    
     # method to change the user password
     def change_password(self, email, password, new_password):

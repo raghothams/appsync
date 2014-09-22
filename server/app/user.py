@@ -1,6 +1,5 @@
 
 from flask.ext.login import UserMixin
-import uuid
 
 class User(UserMixin):
     # EMAIL
@@ -8,8 +7,8 @@ class User(UserMixin):
     # NAME
     # GROUPS (COPY)
 
-    def __init__(self, email=None, password=None, name=None, id=None):
-        self.id = id
+    def __init__(self, email=None, password=None, name=None):
+        self.id = None
         self.email = email
         self.password = password
         self.name = name
@@ -17,10 +16,8 @@ class User(UserMixin):
     def serialize(self):
 
         return {
-            "_id" : str(self.id),
             "email" : self.email,
-            "password" : self.password,
-            "name" : self.name,
+            "name" : self.name
         }
 
 
