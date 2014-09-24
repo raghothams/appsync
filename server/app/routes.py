@@ -27,7 +27,7 @@ def index():
 
 
 # user signup
-@app.route("/api/v1/signup", methods=["POST"])
+@app.route("/signup/", methods=["POST"])
 def signup():
 
     email = request.form["email"]
@@ -53,10 +53,6 @@ def signup():
             user_id = user_mapper.add(user)
             print user_id, "new user"
 
-            # init user_app for user
-            user_app = UserApp()
-            user_app.init(user_id)
-            
         else:
             json_respons['error'] = True
             json_response['data'] = "params error"
@@ -79,7 +75,7 @@ def signup():
 
 
 # login the user
-@app.route("/api/v1/login", methods=["POST"])
+@app.route("/login/", methods=["POST"])
 def login():
 
     result = None
@@ -114,7 +110,7 @@ def login():
 
 
 # logout user
-@app.route("/api/v1/logout")
+@app.route("/logout/")
 @login_required
 def logout():
     logout_user()
@@ -122,7 +118,7 @@ def logout():
 
 
 # get apps
-@app.route("/api/v1/apps/")
+@app.route("/apps/")
 @login_required
 def get_apps():
 
@@ -143,7 +139,7 @@ def get_apps():
 
 
 # update apps
-@app.route("/api/v1/apps/", methods=["POST"])
+@app.route("/apps/", methods=["POST"])
 @login_required
 def update_apps():
 
@@ -151,10 +147,9 @@ def update_apps():
     try:
         user_id = current_user.get_id()
         apps_json_str = request.form["apps"]
-        apps_json = json.loads(apps_json_str)
+        #apps_json = json.loads(apps_json_str)
 
-        print apps_json
-        result = user_app.update(user_id, apps_json['data'])
+        result = user_app.set(user_id, apps_json_str)
 
         if result:
             print result
