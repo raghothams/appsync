@@ -3,6 +3,7 @@ import psycopg2
 import psycopg2.extras
 import conf
 import json
+import traceback
 
 
 class UserApp:
@@ -26,23 +27,21 @@ class UserApp:
 
         try:
 
-            print apps
-            print user_id
             query = "UPDATE public.users SET apps = %s WHERE id = %s"
-            cur.execute(query, (apps, user_id))
+            cur.execute(query, (psycopg2.extras.Json(apps), user_id))
 
             if cur.rowcount == 1: 
 
                 self.db.commit()
                 result = True
 
-        except Exception as e:
-            print e
+        except psycopg2.DatabaseError as e:
+            cur.close()
+            raise e
             #print traceback.format_exc(e)
                 
-        finally:
-            cur.close()
-            return result
+        cur.close()
+        return result
 
 
 
@@ -57,14 +56,14 @@ class UserApp:
             cur.execute(query, (user_id,))
 
             row = cur.fetchone()
-
-            result = {}
-            result['apps'] = row
+            return row
 
         except Exception as e:
-            print traceback.format_exc(e)
-                
-        finally:
             cur.close()
-            return result
+            print traceback.format_exc(e)
+            raise e
+
+                
+        cur.close()
+        return result
 

@@ -58,8 +58,6 @@ class UserDAO:
                 row = cur.fetchone()
                 self.db.commit()
                 result = row[0]
-                app_mapper = UserApp()
-                app_mapper.init(result)
 
         except Exception as e:
 
@@ -154,7 +152,6 @@ class UserDAO:
         except Exception as e:
 
             print "An error occurred while reading user id"
-            print e
             raise e
         
         finally:

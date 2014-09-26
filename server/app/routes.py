@@ -2,6 +2,7 @@ from flask import request, make_response, send_file, session, jsonify
 from flask.ext.login import (LoginManager, login_user, logout_user,
         current_user, login_required, confirm_login)
 
+import psycopg2.extras
 import uuid
 import traceback
 import json
@@ -128,14 +129,15 @@ def get_apps():
         apps = user_app.get(user_id)
 
         if apps:
+            response = {}
+            response['user'] = current_user.serialize()
+            response['apps'] = apps
+            return jsonify(response)
 
-            return jsonify(apps)
 
     except Exception as e:
-        #print traceback.format_exc(e)
         print e
-        #raise ExceptionResponse() 
-        return "error"
+        raise ExceptionResponse() 
 
 
 # update apps
@@ -147,13 +149,15 @@ def update_apps():
     try:
         user_id = current_user.get_id()
         apps_json_str = request.form["apps"]
-        #apps_json = json.loads(apps_json_str)
+        apps_json = json.loads(apps_json_str)
+        result = user_app.set(user_id, apps_json )
 
-        result = user_app.set(user_id, apps_json_str)
+    except Exception as e:
+        print e
+        raise ExceptionResponse("Bad json", 400)
 
+    try:
         if result:
-            print result
-
             response = {}
             response['data'] = result
             return jsonify(response)
@@ -161,28 +165,33 @@ def update_apps():
         else:
             return  "lol no data"
 
+    except psycopg2.DatabaseError as e:
+        print e
+        raise ExceptionResponse()
+    
     except Exception as e:
-        print traceback.format_exc(e)
-        #raise ExceptionResponse() 
-        return "error"
+        print e
+        raise ExceptionResponse()
+        #return "error"
 
 
 
 class ExceptionResponse(Exception):
 
-    def __init__(self, message=None):
+    def __init__(self, message=None, status=500):
 
         Exception.__init__(self)
+        self.status = status
         self.message = message or "Internal Server Error"
 
     def __dict__(self):
 
         rv = {}
-        rv['error'] = 500
-        rv['message'] = self.message
+        rv['error_code'] = self.status
+        rv['message'] = str(self.message)
         return rv
 
 @app.errorhandler(ExceptionResponse)
 def internal_error(error):
-    return make_response(jsonify(error.__dict__()), 500)
+    return make_response(jsonify(error.__dict__()), error.status)
 
