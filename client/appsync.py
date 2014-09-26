@@ -9,6 +9,9 @@
 
 import subprocess
 import re
+import json
+import requests
+import conf
 
 def main():
   output = None
@@ -45,10 +48,30 @@ def main():
     # delete
     del apps
 
+    # fire HTTP POST request to save the list
+    s = requests.Session()
+    authenticate(s)
+    save_to_cloud(s, app_names)
+    save_to_file(app_names)
+    
     # write app names to a file
+
+def save_to_cloud(session, apps):
+    url = conf.host+'/apps/'
+    payload = {"apps":json.dumps(apps)}
+    r = session.post(url, data=payload)
+    print r
+
+def save_to_file(apps):
     with open("apps.txt", "w") as wf:
-        for app_name in app_names:
-            wf.write(app_name + "\n")
+        for app in apps:
+            wf.write(app + "\n")
+
+def authenticate(session):
+    url = conf.host+'/login/'
+    payload = {"email":conf.email, "password":conf.password}
+
+    r = session.post(url, data = payload)
 
 if __name__ == "__main__":
   main()
