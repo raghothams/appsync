@@ -56,7 +56,7 @@ class UserApp:
             cur.execute(query, (user_id,))
 
             row = cur.fetchone()
-            return row
+            return row[0]
 
         except Exception as e:
             cur.close()
